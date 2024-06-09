@@ -1,0 +1,11 @@
+{
+  "name": "agriconnect",
+  "displayName": "agriconnect",
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "722ef475-2a85-41f9-9729-f9bfa1bd69a4"
+      }
+    }
+  }
+}

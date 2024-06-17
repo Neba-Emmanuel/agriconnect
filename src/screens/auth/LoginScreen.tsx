@@ -21,6 +21,7 @@ import Notifications, {
 } from '../../components/notification/notification.component';
 import {loginFunc} from '../../redux/auth/thunk/auth.thunk';
 import {resetIsState} from '../../redux/auth/slices/auth.slice';
+import Loader from '../../loader/loader';
 
 type Props = {
   navigation: any;
@@ -41,6 +42,7 @@ const LoginScreen: FC<Props> = ({navigation}) => {
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const loginState = useAppSelector((state: RootState) => state.authSlice);
+  const {loading} = useAppSelector((state: RootState) => state.authSlice);
   const dispatch = useAppDispatch();
 
   const [notify, setNotify] = useState<boolean>(false);
@@ -56,9 +58,9 @@ const LoginScreen: FC<Props> = ({navigation}) => {
     // Dispatch the login function
     dispatch(loginFunc(values))
       .unwrap()
-      .then(() => {
-        navigation.navigate('Dashboard');
-      })
+      // .then(() => {
+      //   navigation.navigate('Dashboard');
+      // })
       .catch((error: any) => {
         console.error('Login failed', error);
       });
@@ -74,7 +76,7 @@ const LoginScreen: FC<Props> = ({navigation}) => {
         });
         setSubmitted(false);
       }
-      if (loginState.isSuccess) {
+      if (loginState.accessToken !== null) {
         setNotify(true);
         setDetails({
           type: NotificationType.SUCCESS,
@@ -93,13 +95,19 @@ const LoginScreen: FC<Props> = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    if (!loginState.user?.id) {
+    if (!loginState.user?._id) {
+      console.log('login state', loginState);
       return;
     }
-    if (loginState.user?.id) {
+    if (loginState.user?._id) {
       navigation.navigate('Dashboard');
+      console.log('login state', loginState);
     }
   }, [dispatch, navigation, loginState]);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   const renderForm = ({
     handleChange,

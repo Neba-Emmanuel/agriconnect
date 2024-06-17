@@ -50,7 +50,7 @@ const ProfileScreen: FC<Props> = ({navigation}) => {
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={{left: theme.screenWidth * 0.02}}>
-            <Icons size={20} icon={IconType.ARROW_LEFT} color={theme.white} />
+            <Icons size={30} icon={IconType.BACK} color={theme.white} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={logout}

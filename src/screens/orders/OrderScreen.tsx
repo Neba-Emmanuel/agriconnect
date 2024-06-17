@@ -167,7 +167,7 @@ const OrderScreen: FC<Props> = ({navigation}) => {
           </View>
         </View>
         <View style={{paddingBottom: theme.screenHeight * 0.3}}>
-          {renderOrders}
+          {/* {renderOrders} */}
         </View>
       </View>
     </SafeAreaView>

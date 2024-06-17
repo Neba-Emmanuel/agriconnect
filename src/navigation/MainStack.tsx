@@ -17,6 +17,10 @@ import PaymentMethod from '../screens/payment/paymentScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import ViewTranscript from '../screens/dashboard/viewTranscript';
 import LoginScreen from '../screens/auth/LoginScreen';
+import ProductDetailScreen from '../screens/productDetails/productScreen';
+import CartScreen from '../screens/cartScreen/CartScreen';
+import CheckoutDetailsScreen from '../screens/CheckoutScreen/CheckoutDetailsScreen';
+import CheckoutOptionsScreen from '../screens/CheckoutScreen/CheckoutOptionsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -28,8 +32,8 @@ const HomeTabs: FC = () => {
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: 90,
-          paddingBottom: 22,
+          height: 70,
+          paddingBottom: 5,
           paddingTop: 6,
           backgroundColor: theme.primary,
         },
@@ -118,6 +122,16 @@ const MainStack: FC = () => {
         <Stack.Screen name="viewtranscript" component={ViewTranscript} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+        <Stack.Screen name="CartScreen" component={CartScreen} />
+        <Stack.Screen
+          name="CheckoutOptions"
+          component={CheckoutOptionsScreen}
+        />
+        <Stack.Screen
+          name="CheckoutDetails"
+          component={CheckoutDetailsScreen}
+        />
       </Stack.Navigator>
     </>
   );

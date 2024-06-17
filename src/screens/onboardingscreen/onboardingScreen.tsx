@@ -44,9 +44,7 @@ const OnboardingScreen: FC<Props> = ({navigation}) => {
         {
           backgroundColor: theme.primary,
           image: (
-            <Image
-              source={require('../../assets/images/onboarding-img1.png')}
-            />
+            <Image source={require('../../assets/images/onboarding1.png')} />
           ),
           title: 'Expand Your Reach',
           subtitle:
@@ -55,9 +53,7 @@ const OnboardingScreen: FC<Props> = ({navigation}) => {
         {
           backgroundColor: theme.secondary,
           image: (
-            <Image
-              source={require('../../assets/images/onboarding-img2.png')}
-            />
+            <Image source={require('../../assets/images/onboarding2.png')} />
           ),
           title: 'Fresh Produce',
           subtitle:
@@ -66,9 +62,7 @@ const OnboardingScreen: FC<Props> = ({navigation}) => {
         {
           backgroundColor: theme.tertiary,
           image: (
-            <Image
-              source={require('../../assets/images/onboarding-img3.png')}
-            />
+            <Image source={require('../../assets/images/onboarding3.png')} />
           ),
           title: 'Fair Prices',
           subtitle:

@@ -35,11 +35,11 @@ export default class AuthSerivces {
     try {
       const token = await storage.load('@token');
 
-      const response = await fetch('http://10.0.2.2:5000/api/user', {
+      const response = await fetch(AuthApis.getUserProfile, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': token,
+          Authorization: `Bearer ${token}`,
         },
       });
 

@@ -1,10 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
-
 import {
   loginFunc,
   registerFunc,
   forgotPassword,
   loadUserFunc,
+  fetchUserData,
 } from '../thunk/auth.thunk';
 import storage from '../../../utils/storage';
 import {ErrorMessage} from '../../../interface/messages/MessageTypes';
@@ -31,7 +31,7 @@ const initialState: AuthState = {
   user: {},
   userData: {},
   isError: false,
-  isSuccess: false,
+  isSuccess: true,
   message: '',
   isLoading: false,
   accessToken: 'accessTokenFromStorage',
@@ -55,7 +55,6 @@ const authSlice = createSlice({
       state.isSuccess = false;
       state.isLoading = false;
       state.accessToken = '';
-      state.accessToken = '';
       state.refreshToken = '';
       state.loading = false;
       storage.remove('@user');
@@ -76,7 +75,6 @@ const authSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = action.payload;
-      console.log('user ', action.payload);
       state.userData = action.payload;
     },
     setToken: (state, action) => {
@@ -88,7 +86,7 @@ const authSlice = createSlice({
       .addCase(loginFunc.pending, state => {
         state.isLoading = true;
         state.isError = false;
-        state.isSuccess = false;
+        state.isSuccess = true;
       })
       .addCase(loginFunc.rejected, (state, action) => {
         state.isLoading = false;
@@ -98,14 +96,26 @@ const authSlice = createSlice({
       .addCase(loginFunc.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        console.log('hello', action.payload);
+        state.user = action.payload?.user;
+        state.userData = action.payload?.user;
         state.accessToken = action.payload?.token;
+        storage.storeInfo('@user', action?.payload?.user);
         storage.storeInfo('@token', action?.payload?.token);
+        console.log('hello', action.payload);
+      })
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.userData = action.payload;
+        storage.storeInfo('@user', action.payload);
+      })
+      .addCase(fetchUserData.rejected, (state, action) => {
+        state.isError = true;
+        state.message = action.error.message || '';
       })
       .addCase(registerFunc.pending, state => {
         state.isLoading = true;
         state.isError = false;
-        state.isSuccess = false;
+        state.isSuccess = true;
       })
       .addCase(registerFunc.rejected, (state, action) => {
         state.isLoading = false;
@@ -115,9 +125,11 @@ const authSlice = createSlice({
       .addCase(registerFunc.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        console.log('payload...', action.payload);
+        state.user = action.payload?.user;
+        state.userData = action.payload?.user;
+        console.log(action.payload);
         state.accessToken = action.payload?.token;
-        state.refreshToken = action.payload?.refresh_token;
+        storage.storeInfo('@user', action?.payload?.user);
         storage.storeInfo('@token', action?.payload?.token);
       })
       .addCase(forgotPassword.pending, state => {
@@ -143,8 +155,8 @@ const authSlice = createSlice({
       .addCase(loadUserFunc.fulfilled, (state, action) => {
         state.loading = false;
         state.isSuccess = true;
-        console.log('user ', action.payload);
         state.userData = action.payload;
+        storage.storeInfo('@user', action?.payload);
         state.isError = false;
       })
       .addCase(loadUserFunc.rejected, (state, action) => {

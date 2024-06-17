@@ -27,9 +27,7 @@ export interface TranscriptDataType {
 }
 
 export interface PaymentDataType {
-  user: string;
   amount: string;
   service: string;
   payer: string;
-  status: string;
 }

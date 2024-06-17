@@ -57,7 +57,7 @@ const RegisterScreen: FC<Props> = ({navigation}) => {
     }
   };
 
-  // Call checkConnection somewhere in your app, e.g., useEffect or a button press
+  // Call checkConnection
   useEffect(() => {
     checkConnection();
   }, []);
@@ -69,7 +69,7 @@ const RegisterScreen: FC<Props> = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (loginState.isSuccess && loginState.user?.id) {
+    if (loginState.user?._id) {
       console.log('login state', loginState.user);
       navigation.navigate('Dashboard');
     }
@@ -85,7 +85,7 @@ const RegisterScreen: FC<Props> = ({navigation}) => {
         });
         setSubmitted(false);
       }
-      if (loginState.isSuccess) {
+      if (loginState.accessToken !== null) {
         setNotify(true);
         setDetails({
           type: NotificationType.SUCCESS,

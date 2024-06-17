@@ -9,6 +9,7 @@ import {IconType} from '../../components/icon/icons.component';
 import {PaymentDataType} from '../../interface/auth/AuthTypes';
 import storage from '../../utils/storage';
 import {AuthApis} from '../../services/api/auth/AuthApis';
+import axios from 'axios';
 
 type Props = {
   navigation: any;
@@ -18,7 +19,6 @@ const PaymentMethod: FC<Props> = ({navigation}: Props) => {
   const [payer, setPayer] = useState('');
 
   const isValidPhoneNumber = (input: string): boolean => {
-    // const regexPattern = /^\+237[6237]\d{8}$/;
     const isNumeric = /^\d+$/.test(input);
     const startsWith6 = input.startsWith('6');
     const hasValidLength = input.length >= 9;
@@ -50,53 +50,63 @@ const PaymentMethod: FC<Props> = ({navigation}: Props) => {
     return true;
   };
 
-  const makePayment = async ({
-    amount,
-    service,
-    payer,
-    user,
-    status,
-  }: PaymentDataType) => {
-    console.log('payer', payer);
-    const token = await storage.load('@token');
+  // const makePayment = async ({amount, service, payer}: PaymentDataType) => {
+  //   console.log('payer', payer);
+  //   try {
+  //     const token = await storage.load('@token');
 
-    fetch(AuthApis.payment, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token,
-      },
-      body: JSON.stringify({amount, service, payer, user, status}),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.operationSuccess && data.transactionSuccess) {
-          console.log('Payment successful:', data);
-        } else {
-          console.log('Payment failed:', data);
-        }
-      })
-      .catch(error => {
-        console.error('Payment error:', error);
-      });
+  //     const response = await axios.post(
+  //       AuthApis.payment,
+  //       {amount, service, payer},
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'x-auth-token': token,
+  //         },
+  //       },
+  //     );
+
+  //     if (response.data.operationSuccess && response.data.transactionSuccess) {
+  //       console.log('Payment successful:', response.data);
+  //     } else {
+  //       console.log('Payment failed:', response.data);
+  //     }
+  //   } catch (error) {
+  //     console.error('Payment error:', error);
+  //   }
+  // };
+
+  const makePayment = async () => {
+    const token = await storage.load('@token');
+    console.log('Payment token:', token);
+
+    try {
+      const response = await axios.post(
+        AuthApis.payment,
+        {
+          amount: 100,
+          service: 'MTN',
+          payer: '676607269',
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      console.log('Payment response:', response.data);
+    } catch (error: any) {
+      console.error('Payment error:', error.response.data);
+    }
   };
 
   const handleSubmit = () => {
     if (isValidPhoneNumber(payer)) {
       console.log('Payer Phone Number:', payer);
-      makePayment({
-        amount: '100',
-        service: 'MTN',
-        payer,
-        user: 'John Doe',
-        status: 'pending',
-      });
-      navigation.navigate('loadscreen');
+      makePayment();
+      // navigation.navigate('loadscreen');
     } else {
       console.log('Invalid phone number');
     }

@@ -84,6 +84,7 @@ export enum IconType {
   AGREEMENT = 'agreement',
   SEND_FILLED = 'send_filled',
   PROFILE2 = 'profile2',
+  BACK = 'back',
 }
 
 const Icons: React.FC<Props> = ({icon, size = 35, color}) => {
@@ -316,6 +317,9 @@ const Icons: React.FC<Props> = ({icon, size = 35, color}) => {
   }
   if (icon === IconType.ARROW_LEFT) {
     _icon = require('../../resources/icons/arrow-left.png');
+  }
+  if (icon === IconType.BACK) {
+    _icon = require('../../resources/icons/back.webp');
   }
 
   return (

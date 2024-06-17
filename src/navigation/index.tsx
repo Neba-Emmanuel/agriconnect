@@ -11,12 +11,16 @@ import {setUser} from '../redux/auth/slices/auth.slice';
 
 const App = () => {
   const dispatch = useAppDispatch();
-  const {user, loading, userData} = useAppSelector(
+  const {loading, userData, accessToken} = useAppSelector(
     (state: RootState) => state.authSlice,
   );
+
   useEffect(() => {
-    dispatch(loadUserFunc() as unknown as AnyAction);
-  }, [dispatch]);
+    // Only load user if accessToken exists
+    if (accessToken) {
+      dispatch(loadUserFunc() as unknown as AnyAction);
+    }
+  }, [dispatch, accessToken]);
 
   useEffect(() => {
     if (userData?._id) {
@@ -27,12 +31,10 @@ const App = () => {
   if (loading) {
     return <Loader />;
   }
-  console.log('Loading user', user);
 
   return (
     <NavigationContainer>
       {userData?._id ? <MainStack /> : <AuthStack />}
-      {/* <MainStack /> */}
     </NavigationContainer>
   );
 };

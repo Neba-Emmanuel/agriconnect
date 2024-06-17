@@ -5,18 +5,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'space-evenly',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.white,
   },
   logoWrapper: {
-    width: 320,
-    height: 90,
+    width: theme.screenWidth * 0.5,
+    height: theme.screenHeight,
     marginHorizontal: 'auto',
   },
   logo: {
-    width: '100%',
-    height: '100%',
+    width: 200,
+    height: 200,
   },
 });
 

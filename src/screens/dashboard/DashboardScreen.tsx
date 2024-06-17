@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {FC} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {
   SafeAreaView,
   View,
@@ -7,107 +7,65 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Platform,
 } from 'react-native';
 import styles from './dashboard.style';
 import Avatar from '../../components/avatar/Avatar';
 import theme from '../../resources/theme';
 import Icons, {IconType} from '../../components/icon/icons.component';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import htmlContent from './extras';
-import {useAppSelector} from '../../redux/typings';
-import {RootState} from '../../redux/store';
+import {products} from '../../resources/data/products';
+import {categories} from '../../resources/data/categories';
+import CustomTextInput from '../../components/input/input';
+import {useCart} from '../cartScreen/cartContext';
+// import {useAppSelector} from '../../redux/typings';
+// import {RootState} from '../../redux/store';
 
 type Props = {
   navigation?: any;
 };
 
-const appliedTranscript = [
-  {id: 1, number: 0o1},
-  {id: 2, number: 0o2},
-  {id: 3, number: 0o3},
-  {id: 4, number: 0o4},
-  {id: 5, number: 0o5},
-];
-
 const DashboardScreen: FC<Props> = ({navigation}) => {
-  const {user} = useAppSelector((state: RootState) => state.authSlice);
+  // const {user} = useAppSelector((state: RootState) => state.authSlice);
 
-  const createPDF = async () => {
-    let options = {
-      html: htmlContent,
-      fileName: user?.fullName ?? 'transcript',
-      directory: 'Documents',
-      width: 850,
-      height: 595,
-    };
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [searchText, setSearchText] = useState('');
+  const {cartItemCount} = useCart();
 
-    let file = await RNHTMLtoPDF.convert(options);
-    console.log(file.filePath);
-    // alert(file.filePath);
-  };
+  useEffect(() => {
+    if (selectedCategory === 'All') {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter(
+        product => product.category === selectedCategory,
+      );
+      setFilteredProducts(filtered);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, products]);
 
-  const renderApplication = (
-    <FlatList
-      keyExtractor={transcript => transcript.id.toString()}
-      data={appliedTranscript}
-      renderItem={({item}) => {
-        return (
-          <View style={styles.transContainer}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                top: theme.screenHeight * 0.025,
-                left: theme.screenWidth * 0.01,
-              }}>
-              <Image
-                source={require('../../resources/icons/summary.png')}
-                style={styles.transcript}
-              />
-              <Text
-                style={{
-                  color: '#000',
-                  fontSize: 17,
-                  left: theme.screenWidth * 0.07,
-                }}>
-                Student Academic Record N-{item.number}
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginHorizontal: 55,
-                top: theme.screenHeight * 0.035,
-                left: theme.screenWidth * 0.01,
-              }}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('viewtranscript')}>
-                <Text
-                  style={{
-                    textDecorationLine: 'underline',
-                    fontSize: 16,
-                    color: '#2372E9',
-                  }}>
-                  View
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => createPDF()}>
-                <Text
-                  style={{
-                    textDecorationLine: 'underline',
-                    fontSize: 16,
-                    color: '#2372E9',
-                  }}>
-                  Download
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        );
-      }}
-    />
+  const renderCategory = ({item}: any) => (
+    <TouchableOpacity
+      style={[
+        styles.categoryContainer,
+        selectedCategory === item.name && styles.selectedCategory,
+      ]}
+      onPress={() => setSelectedCategory(item.name)}>
+      <Image source={item.image} style={styles.categoryImage} />
+      <Text style={styles.categoryName}>{item.name}</Text>
+    </TouchableOpacity>
   );
+
+  const renderProduct = ({item}: any) => (
+    <TouchableOpacity
+      style={styles.productContainer}
+      onPress={() => navigation.navigate('ProductDetail', {product: item})}>
+      <Image source={item.image} style={styles.productImage} />
+      <Text style={styles.productName}>{item.name}</Text>
+      <Text style={styles.productPrice}>{item.price.toFixed(2)} FCFA</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
@@ -131,78 +89,74 @@ const DashboardScreen: FC<Props> = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 // left: theme.screenWidth * 0.03,
-              }}>
-              <Text style={{color: 'black', fontSize: theme.fontSizeNormal}}>
-                Welcome on E-Transcript
-              </Text>
-              <Text
-                style={{
-                  fontSize: theme.fontSizeLarge,
-                  fontWeight: '800',
-                  color: 'black',
-                }}>
-                {user?.username ?? 'Neba Emmanuel'}
-              </Text>
-              <Text
-                style={{
-                  color: 'black',
-                  fontSize: theme.fontSizeNormal,
-                  fontWeight: '800',
-                }}>
-                {user?.email ?? 'CT22A287'}
-              </Text>
+              }}
+            />
+
+            <View
+              style={
+                Platform.OS === 'android'
+                  ? {width: 235, left: -theme.screenWidth * 0.008}
+                  : {width: 265, left: -theme.screenWidth * 0.005}
+              }>
+              <CustomTextInput
+                placeholder="Search..."
+                onChangeText={item => {
+                  setSearchText(item);
+                }}
+                // onBlur={handleBlur('email')}
+                value={searchText}
+                icon={
+                  <Icons size={20} icon={IconType.SEARCH} color={theme.gray} />
+                }
+              />
             </View>
-            <TouchableOpacity
-              // style={{left: theme.screenWidth * 0.08}}
-              onPress={() => navigation.navigate('Notifications')}>
+
+            <TouchableOpacity onPress={() => navigation.navigate('CartScreen')}>
               <Icons
                 size={30}
-                icon={IconType.NOTIFICATION}
-                color={theme.black}
+                icon={IconType.SHOPPING_CART}
+                color={theme.primary}
               />
+              {cartItemCount > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{cartItemCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
           {/* <Icons size={30} icon={IconType.NOTIFICATION} color={theme.black} /> */}
         </View>
-        <View style={styles.applyContainer}>
-          <View style={{flexDirection: 'row'}}>
-            <Image
-              source={require('../../assets/images/apply.png')}
-              style={styles.apply}
-            />
-            <Text
-              style={{
-                width: 100,
-                fontSize: 16,
-                fontStyle: 'italic',
-                color: '#fff',
-                fontWeight: '800',
-                marginLeft: 10,
-              }}>
-              Transcript Request
-            </Text>
-          </View>
-          <TouchableOpacity onPress={() => navigation.navigate('Apply')}>
-            <Text
-              style={{
-                textDecorationLine: 'underline',
-                marginTop: 20,
-                fontSize: 16,
-                color: '#fff',
-              }}>
-              Apply Now
-            </Text>
-          </TouchableOpacity>
-        </View>
+
+        {/* <View>
+          <Text style={{marginBottom: -18, marginTop: 20}}>Categories</Text>
+        </View> */}
+
         <View>
-          <Text style={{color: '#000', marginVertical: 15}}>History</Text>
-          <View
-            style={{
-              paddingBottom: theme.screenHeight * 1,
-              marginBottom: theme.screenHeight * 0.2,
-            }}>
-            {renderApplication}
-          </View>
+          <FlatList
+            ListHeaderComponent={
+              <FlatList
+                data={[
+                  {
+                    id: 'all',
+                    name: 'All',
+                    image: require('../../assets/images/table-birds.webp'),
+                  },
+                  ...categories,
+                ]}
+                renderItem={renderCategory}
+                keyExtractor={item => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.categoryList}
+              />
+            }
+            data={filteredProducts}
+            renderItem={renderProduct}
+            keyExtractor={item => item.id}
+            numColumns={2}
+            contentContainerStyle={styles.productList}
+            showsVerticalScrollIndicator={false}
+          />
         </View>
       </View>
     </SafeAreaView>

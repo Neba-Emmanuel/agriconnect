@@ -14,7 +14,7 @@ const HomeScreen: FC<Props> = ({navigation}) => {
         <View style={styles.section}>
           <View style={styles.brandWrapper}>
             <ImageBackground
-              source={require('../../assets/images/job2.jpg')}
+              source={require('../../assets/images/logo.png')}
               resizeMode="cover"
               style={styles.image}
             />

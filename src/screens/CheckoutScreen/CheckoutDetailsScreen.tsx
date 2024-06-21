@@ -17,6 +17,9 @@ import storage from '../../utils/storage';
 import {AuthApis} from '../../services/api/auth/AuthApis';
 import axios from 'axios';
 import CustomTextInput from '../../components/input/input';
+import Notifications, {
+  NotificationType,
+} from '../../components/notification/notification.component';
 
 const CheckoutDetailsScreen: React.FC<{route: any; navigation: any}> = ({
   route,
@@ -26,14 +29,19 @@ const CheckoutDetailsScreen: React.FC<{route: any; navigation: any}> = ({
   const {cart} = useCart();
   const [address, setAddress] = useState('');
   const [number, setNumber] = useState('');
-  const sellerPhoneNumber = 233;
+  const sellerPhoneNumber = 237676607269;
+  const [notify, setNotify] = useState<boolean>(false);
+  const [details, setDetails] = useState({
+    type: NotificationType.DEFAULT,
+    message: 'password error',
+  });
 
   const productTotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
   const getTotalAmount = () => {
-    const deliveryFee = method === 'delivery' ? 1000 : 0;
+    const deliveryFee = method === 'delivery' ? 10 : 0;
     return productTotal + deliveryFee;
   };
 
@@ -72,14 +80,23 @@ const CheckoutDetailsScreen: React.FC<{route: any; navigation: any}> = ({
   const makePayment = async (service: string) => {
     const token = await storage.load('@token');
     console.log('Payment token:', token);
+    console.log(address);
+    console.log(cart.map(item => `${item.name}`));
+    console.log(service);
+    console.log(getTotalAmount().toFixed(2));
 
     try {
       const response = await axios.post(
         AuthApis.payment,
         {
           amount: getTotalAmount().toFixed(2),
-          service: service,
+          service,
           payer: number,
+          products: cart.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
+          address,
         },
         {
           headers: {
@@ -88,9 +105,21 @@ const CheckoutDetailsScreen: React.FC<{route: any; navigation: any}> = ({
           },
         },
       );
-
       console.log('Payment response:', response.data);
+      setNotify(true);
+      setDetails({
+        type: NotificationType.SUCCESS,
+        message: 'Payment completed',
+      });
+      navigation.navigate('PaymentStatus', {paymentResponse: response.data});
     } catch (error: any) {
+      setDetails({
+        type: NotificationType.DANGER,
+        message: error.response.data,
+      });
+      navigation.navigate('PaymentStatus', {
+        paymentResponse: error.response.data,
+      });
       console.error('Payment error:', error.response.data);
     }
   };
@@ -197,7 +226,7 @@ const CheckoutDetailsScreen: React.FC<{route: any; navigation: any}> = ({
             <TouchableOpacity
               style={styles.whatsappButton}
               onPress={() => Linking.openURL(getWhatsAppLink())}>
-              <Text style={styles.whatsappButtonText}>WhatsApp Me</Text>
+              <Text style={styles.whatsappButtonText}>WhatsApp Seller</Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.paymentMethods}>
@@ -215,6 +244,14 @@ const CheckoutDetailsScreen: React.FC<{route: any; navigation: any}> = ({
           )}
         </View>
       </View>
+      {notify && (
+        <Notifications
+          show={notify}
+          setShow={setNotify}
+          type={details.type}
+          message={details.message}
+        />
+      )}
     </SafeAreaView>
   );
 };

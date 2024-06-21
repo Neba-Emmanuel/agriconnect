@@ -21,6 +21,7 @@ import ProductDetailScreen from '../screens/productDetails/productScreen';
 import CartScreen from '../screens/cartScreen/CartScreen';
 import CheckoutDetailsScreen from '../screens/CheckoutScreen/CheckoutDetailsScreen';
 import CheckoutOptionsScreen from '../screens/CheckoutScreen/CheckoutOptionsScreen';
+import PaymentStatus from '../screens/CheckoutScreen/paymentStatus';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -132,6 +133,7 @@ const MainStack: FC = () => {
           name="CheckoutDetails"
           component={CheckoutDetailsScreen}
         />
+        <Stack.Screen name="PaymentStatus" component={PaymentStatus} />
       </Stack.Navigator>
     </>
   );

@@ -49,6 +49,27 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     borderRadius: 20,
   },
+  orderItem: {
+    padding: 16,
+    marginVertical: 8,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+  },
+  cartBadge: {
+    position: 'absolute',
+    right: -10,
+    top: -10,
+    backgroundColor: 'orange',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cartBadgeText: {
+    color: 'white',
+    fontSize: 12,
+  },
 });
 
 export default styles;

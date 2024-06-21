@@ -13,4 +13,5 @@ export const AuthApis = {
   forgotPassword: BASE_URL + '/auth/forgot-password',
   ping: BASE_URL + '/',
   payment: BASE_URL + '/payment/collect',
+  orders: BASE_URL + '/orders/all',
 };

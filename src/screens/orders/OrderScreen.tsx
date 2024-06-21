@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,143 +10,51 @@ import styles from './order.style';
 import Avatar from '../../components/avatar/Avatar';
 import theme from '../../resources/theme';
 import Icons, {IconType} from '../../components/icon/icons.component';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
+import {fetchAllOrders} from '../../redux/slices/orders';
+import {useCart} from '../cartScreen/cartContext';
 
 type Props = {
   navigation?: any;
 };
 
-const orders = [
-  {
-    id: 1,
-    level: '450',
-    mode: 'Fast Mode',
-    date: '12/05,2023',
-    status: 'pending',
-  },
-  {
-    id: 2,
-    level: '450',
-    mode: 'Fast Mode',
-    date: '12/05,2023',
-    status: 'pending',
-  },
-  {
-    id: 3,
-    level: '400',
-    mode: 'Fast Mode',
-    date: '12/05,2023',
-    status: 'closed',
-  },
-  {
-    id: 4,
-    level: '300',
-    mode: 'Slow Mode',
-    date: '12/05,2023',
-    status: 'closed',
-  },
-  {
-    id: 5,
-    level: '450',
-    mode: 'Fast Mode',
-    date: '12/05,2023',
-    status: 'pending',
-  },
-  {
-    id: 6,
-    level: '450',
-    mode: 'Fast Mode',
-    date: '12/05,2023',
-    status: 'pending',
-  },
-  {
-    id: 7,
-    level: '400',
-    mode: 'Fast Mode',
-    date: '12/05,2023',
-    status: 'closed',
-  },
-  {
-    id: 8,
-    level: '300',
-    mode: 'Slow Mode',
-    date: '12/05,2023',
-    status: 'closed',
-  },
-  {
-    id: 10,
-    level: '400',
-    mode: 'Fast Mode',
-    date: '12/05,2025',
-    status: 'closed',
-  },
-  {
-    id: 11,
-    level: '300',
-    mode: 'Slow Mode',
-    date: '12/05,2024',
-    status: 'closed',
-  },
-];
-
-const renderOrders = (
-  <FlatList
-    keyExtractor={order => order.id.toString()}
-    data={orders}
-    renderItem={({item}) => {
-      return (
-        <View style={styles.orders}>
-          <View>
-            <Icons
-              size={40}
-              icon={IconType.INFORMATION}
-              color={theme.primary}
-            />
-          </View>
-          <View style={{marginLeft: -theme.screenWidth * 0.08}}>
-            <Text style={{color: theme.black, fontSize: 18, fontWeight: '600'}}>
-              Level {item.level}
-            </Text>
-            <Text style={{color: theme.black, fontSize: 16}}>{item.mode}</Text>
-            <Text style={{color: theme.grayLight}}>{item.date}</Text>
-          </View>
-          {item.status == 'pending' ? (
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: theme.grayLight,
-                width: 100,
-                minHeight: 50,
-                borderRadius: 4,
-              }}>
-              <Text style={[styles.status, {color: theme.white}]}>
-                {item.status}
-              </Text>
-            </View>
-          ) : (
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: theme.primary,
-                width: 100,
-                minHeight: 50,
-                borderRadius: 4,
-              }}>
-              <Text style={[styles.status, {color: theme.white}]}>
-                {item.status}
-              </Text>
-            </View>
-          )}
-        </View>
-      );
-    }}
-  />
-);
-
 const OrderScreen: FC<Props> = ({navigation}) => {
+  const dispatch = useDispatch();
+  const {cartItemCount} = useCart();
+  const {orders, loading, error} = useSelector(
+    (state: RootState) => state.orders,
+  );
+
+  useEffect(() => {
+    dispatch(fetchAllOrders());
+    console.log(orders);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  const renderItem = ({item}: any) => (
+    <TouchableOpacity style={styles.orderItem}>
+      <Text>Order ID: {item._id}</Text>
+      {/* <Text>User: {item.user.name}</Text> */}
+      <Text>Total Amount: {item.totalAmount} FCFA</Text>
+      {item.products.map((product: any, index: number) => (
+        <View key={index}>
+          {/* <Text>Product: {product.productId?.name}</Text> */}
+          {/* <Text>Price: {product.productId?.price} FCFA</Text> */}
+          <Text>Quantity: {product.quantity}</Text>
+        </View>
+      ))}
+      <Text>Status: {item.status}</Text>
+    </TouchableOpacity>
+  );
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
@@ -156,18 +64,26 @@ const OrderScreen: FC<Props> = ({navigation}) => {
               <Avatar />
             </TouchableOpacity>
             <Text style={styles.headerText}>Orders</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Notifications')}>
+            <TouchableOpacity onPress={() => navigation.navigate('CartScreen')}>
               <Icons
                 size={30}
-                icon={IconType.NOTIFICATION}
-                color={theme.black}
+                icon={IconType.SHOPPING_CART}
+                color={theme.primary}
               />
+              {cartItemCount > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{cartItemCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         </View>
         <View style={{paddingBottom: theme.screenHeight * 0.3}}>
-          {/* {renderOrders} */}
+          <FlatList
+            data={orders}
+            renderItem={renderItem}
+            keyExtractor={(item: {_id: string}) => item._id.toString()}
+          />
         </View>
       </View>
     </SafeAreaView>

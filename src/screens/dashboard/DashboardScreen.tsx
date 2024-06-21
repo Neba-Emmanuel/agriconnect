@@ -17,15 +17,15 @@ import {products} from '../../resources/data/products';
 import {categories} from '../../resources/data/categories';
 import CustomTextInput from '../../components/input/input';
 import {useCart} from '../cartScreen/cartContext';
-// import {useAppSelector} from '../../redux/typings';
-// import {RootState} from '../../redux/store';
+// import { useAppSelector } from '../../redux/typings';
+// import { RootState } from '../../redux/store';
 
 type Props = {
   navigation?: any;
 };
 
 const DashboardScreen: FC<Props> = ({navigation}) => {
-  // const {user} = useAppSelector((state: RootState) => state.authSlice);
+  // const { user } = useAppSelector((state: RootState) => state.authSlice);
 
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filteredProducts, setFilteredProducts] = useState(products);
@@ -33,16 +33,29 @@ const DashboardScreen: FC<Props> = ({navigation}) => {
   const {cartItemCount} = useCart();
 
   useEffect(() => {
-    if (selectedCategory === 'All') {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter(
+    filterProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, searchText]);
+
+  const filterProducts = () => {
+    let filtered = products;
+
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(
         product => product.category === selectedCategory,
       );
-      setFilteredProducts(filtered);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, products]);
+
+    if (searchText) {
+      filtered = filtered.filter(
+        product =>
+          product.name.toLowerCase().includes(searchText.toLowerCase()),
+        console.log('Search text', searchText),
+      );
+    }
+
+    setFilteredProducts(filtered);
+  };
 
   const renderCategory = ({item}: any) => (
     <TouchableOpacity
@@ -103,7 +116,6 @@ const DashboardScreen: FC<Props> = ({navigation}) => {
                 onChangeText={item => {
                   setSearchText(item);
                 }}
-                // onBlur={handleBlur('email')}
                 value={searchText}
                 icon={
                   <Icons size={20} icon={IconType.SEARCH} color={theme.gray} />
@@ -128,7 +140,7 @@ const DashboardScreen: FC<Props> = ({navigation}) => {
         </View>
 
         {/* <View>
-          <Text style={{marginBottom: -18, marginTop: 20}}>Categories</Text>
+          <Text style={{ marginBottom: -18, marginTop: 20 }}>Categories</Text>
         </View> */}
 
         <View>

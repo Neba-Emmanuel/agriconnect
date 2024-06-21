@@ -16,6 +16,7 @@ export interface RegisterDataType {
   phoneNumber: string;
   password: string;
   confirmPassword: string;
+  navigation: any;
 }
 
 export interface TranscriptDataType {

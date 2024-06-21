@@ -57,6 +57,16 @@ export const fetchUserData = createAsyncThunk(
   },
 );
 
+// const sendOTP = async (email: any) => {
+//   try {
+//     const response = await axios.post('/api/send-otp', {email});
+//     console.log('OTP sent successfully:', response.data);
+//     // Optionally, navigate to OTP verification screen
+//   } catch (error) {
+//     console.error('Failed to send OTP:', error?.response?.data?.error || '');
+//   }
+// };
+
 export const registerFunc = createAsyncThunk(
   'auth/register',
   async (data: RegisterDataType, thunkAPI) => {
